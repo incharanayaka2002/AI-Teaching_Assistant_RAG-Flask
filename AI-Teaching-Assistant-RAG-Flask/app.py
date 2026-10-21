@@ -1,6 +1,7 @@
 import os
 import re
 import ipaddress
+import numpy as np
 from io import BytesIO
 from urllib.parse import urlparse, urljoin
 
@@ -9,8 +10,6 @@ from dotenv import load_dotenv
 import requests
 from bs4 import BeautifulSoup
 from pypdf import PdfReader
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
 from google import genai
 from google.genai import types
 
@@ -18,7 +17,7 @@ load_dotenv()
 app = Flask(__name__)
 
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-CHUNK_SIZE = 800
+CHUNK_SIZE = 500
 CHUNK_OVERLAP = 150
 TOP_K = 3
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
@@ -141,31 +140,46 @@ def build_index():
             })
     return documents, chunks
 
+def embed_texts(texts, api_key):
+    """Generate text embeddings using Google's hosted embedding API."""
+    client = genai.Client(api_key=api_key)
+    vectors = []
 
-_model = None
+    for text in texts:
+        result = client.models.embed_content(
+            model="gemini-embedding-001",
+            contents=text
+        )
+        vectors.append(result.embeddings[0].values)
+
+    return np.asarray(vectors, dtype=np.float32)
 
 
-def get_embedding_model():
-    global _model
-    if _model is None:
-        _model = SentenceTransformer(EMBEDDING_MODEL)
-    return _model
-
-
-def retrieve(question, chunks, model):
+def retrieve(question, chunks, api_key):
+    """Retrieve the most relevant document chunks using cosine similarity."""
     if not chunks:
         return []
-    chunk_vectors = model.encode(
-        [item["text"] for item in chunks],
-        convert_to_numpy=True,
-        normalize_embeddings=True,
-        show_progress_bar=False,
-    )
-    question_vector = model.encode([question], convert_to_numpy=True, normalize_embeddings=True)
-    scores = cosine_similarity(question_vector, chunk_vectors)[0]
-    indices = scores.argsort()[::-1][:min(TOP_K, len(chunks))]
-    return [{**chunks[i], "score": float(scores[i])} for i in indices]
 
+    chunk_vectors = embed_texts(
+        [item["text"] for item in chunks],
+        api_key
+    )
+    question_vector = embed_texts([question], api_key)[0]
+
+    # Embeddings are normalized before calculating cosine similarity.
+    chunk_norms = np.linalg.norm(chunk_vectors, axis=1, keepdims=True)
+    question_norm = np.linalg.norm(question_vector)
+
+    chunk_vectors = chunk_vectors / np.maximum(chunk_norms, 1e-12)
+    question_vector = question_vector / max(question_norm, 1e-12)
+
+    scores = chunk_vectors @ question_vector
+    indices = scores.argsort()[::-1][:min(TOP_K, len(chunks))]
+
+    return [
+        {**chunks[i], "score": float(scores[i])}
+        for i in indices
+    ]
 
 def generate_answer(question, retrieved, api_key):
     client = genai.Client(api_key=api_key)
@@ -217,8 +231,7 @@ def ask():
         documents, chunks = build_index()
         if not chunks:
             return jsonify({"error": "No course material found. Add files to the documents folder or import a URL."}), 400
-        model = get_embedding_model()
-        retrieved = retrieve(question, chunks, model)
+        retrieved = retrieve(question, chunks, api_key)
         answer = generate_answer(question, retrieved, api_key)
         sources = [{
             "source": item["source"],
