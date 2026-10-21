@@ -1,0 +1,39 @@
+Probability Models and Applications — Starter Notes
+
+These are brief starter notes to demonstrate the retrieval pipeline. Add official course notes before your demonstration.
+
+1. Random variables
+A random variable assigns a numerical value to each outcome of a random experiment. A discrete random variable has a finite or countable set of values; a continuous random variable is described using a probability density function.
+
+2. PMF and PDF
+For a discrete random variable X, p_X(x)=P(X=x), p_X(x)>=0, and the sum of probabilities is 1. For a continuous random variable X, a PDF f_X(x) is non-negative and integrates to 1. P(a<=X<=b)=integral from a to b of f_X(x) dx.
+
+3. CDF
+The cumulative distribution function is F_X(x)=P(X<=x). It is non-decreasing, right-continuous, and ranges from 0 to 1.
+
+4. Binomial distribution
+X~Binomial(n,p) counts successes in n independent Bernoulli trials. P(X=k)=C(n,k)p^k(1-p)^(n-k), k=0,...,n. The mean is np and variance is np(1-p).
+
+5. Poisson distribution
+X~Poisson(lambda) counts events in a fixed interval under assumptions including independent events and a constant average rate. P(X=k)=exp(-lambda)lambda^k/k!, k=0,1,2,... . Its mean and variance are lambda. For lambda=2, P(X=0)=exp(-2), approximately 0.1353.
+
+6. Exponential distribution
+For rate lambda>0, f_X(x)=lambda exp(-lambda x), x>=0. Its mean is 1/lambda and variance is 1/lambda^2. It often models waiting times between Poisson events and has the memoryless property.
+
+7. Gaussian distribution
+For X~Normal(mu,sigma^2), f_X(x)=1/(sigma sqrt(2 pi)) exp(-(x-mu)^2/(2 sigma^2)). Its mean is mu and variance is sigma^2. Standardization uses Z=(X-mu)/sigma.
+
+8. Expectation and variance
+For discrete X, E[X]=sum_x x p_X(x). For continuous X, E[X]=integral x f_X(x) dx when the expectation exists. Var(X)=E[X^2]-(E[X])^2.
+
+9. Joint distributions and independence
+A joint PMF or PDF describes two variables together. Marginals are found by summing or integrating over the other variable. X and Y are independent when the joint distribution factors into the product of their marginals.
+
+10. Law of Large Numbers and Central Limit Theorem
+Under appropriate assumptions, the Law of Large Numbers says sample averages converge to the population mean as sample size increases. The Central Limit Theorem says suitably normalized sums or sample means of independent identically distributed variables with finite variance approach a normal distribution as sample size increases.
+
+11. Chernoff bound
+Chernoff bounds provide exponentially decreasing upper bounds on tail probabilities for sums of independent random variables.
+
+12. Dirac delta sifting property
+The Dirac delta is a generalized function used in mathematical modeling. Its sifting property is integral f(x) delta(x-a) dx=f(a), when the integral includes a and suitable conditions hold.

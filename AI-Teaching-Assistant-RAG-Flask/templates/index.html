@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SPML AI Teaching Assistant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-mark">∑</div>
+    <div>
+      <p class="eyebrow">CSPML · MTech Learning Tool</p>
+      <h1>SPML AI Teaching Assistant</h1>
+    </div>
+    <span class="status-pill"><span class="status-dot"></span> RAG enabled</span>
+  </header>
+
+  <main class="layout">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">PROBABILITY MODELS AND APPLICATIONS</p>
+        <h2>Learn concepts.<br><span>Understand the steps.</span></h2>
+        <p class="hero-description">Ask questions about probability distributions, random variables, limit theorems and more. Answers are grounded in retrieved course material.</p>
+        <div class="stats">
+          <div><strong id="document-count">{{ document_count }}</strong><span>Materials</span></div>
+          <div><strong id="chunk-count">{{ chunk_count }}</strong><span>Searchable chunks</span></div>
+          <div><strong>Top 3</strong><span>Retrieved passages</span></div>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="math-card"><span>𝑃(X = k)</span><span>∫ f(x) dx</span><span>𝑁(μ, σ²)</span><span>λe<sup>−λx</sup></div>
+        <div class="orb orb-one"></div><div class="orb orb-two"></div>
+      </div>
+    </section>
+
+    <div class="content-grid">
+      <section class="panel question-panel">
+        <div class="panel-heading">
+          <div><p class="eyebrow">YOUR STUDY SPACE</p><h2>Ask a question</h2></div>
+          <span class="panel-icon">✦</span>
+        </div>
+        <label for="question">What would you like to understand?</label>
+        <textarea id="question" rows="4" placeholder="e.g. Explain the Poisson distribution with a solved example."></textarea>
+        <div class="suggestions">
+          <button class="suggestion" data-question="Explain the Poisson distribution with a solved example.">Poisson distribution</button>
+          <button class="suggestion" data-question="Explain the Central Limit Theorem in simple terms.">Central Limit Theorem</button>
+          <button class="suggestion" data-question="What is the difference between a PDF and a CDF?">PDF vs CDF</button>
+        </div>
+        <button id="ask-button" class="primary-button"><span>Generate explanation</span><span aria-hidden="true">↗</span></button>
+        <p class="privacy-note">Your question is processed by the local Python backend and Gemini API.</p>
+        <div id="loading" class="loading hidden"><span class="spinner"></span> Searching course notes and preparing an explanation…</div>
+        <div id="error" class="error-box hidden" role="alert"></div>
+      </section>
+
+      <aside class="panel material-panel">
+        <div class="panel-heading"><div><p class="eyebrow">KNOWLEDGE BASE</p><h2>Course materials</h2></div><span class="panel-icon">▤</span></div>
+        <p class="muted">Use your local notes or import a public webpage, PDF, or text file URL.</p>
+        <label for="url-input">Import a public URL</label>
+        <input id="url-input" type="url" placeholder="https://example.com/notes.pdf">
+        <button id="import-button" class="secondary-button">Import material <span>＋</span></button>
+        <div id="import-message" class="inline-message" aria-live="polite"></div>
+        <div class="divider"></div>
+        <h3>How it works</h3>
+        <ol class="steps">
+          <li><span>01</span><div><strong>Retrieve</strong><p>Finds relevant passages from course notes.</p></div></li>
+          <li><span>02</span><div><strong>Explain</strong><p>Gemini uses the retrieved context to answer.</p></div></li>
+          <li><span>03</span><div><strong>Verify</strong><p>Review the source passages below the answer.</p></div></li>
+        </ol>
+        <p class="model-note">Embedding model: <code>all-MiniLM-L6-v2</code><br>Generation model: <code>{{ gemini_model }}</code></p>
+      </aside>
+    </div>
+
+    <section id="answer-panel" class="panel answer-panel hidden">
+      <div class="panel-heading"><div><p class="eyebrow">AI RESPONSE</p><h2>Explanation</h2></div><span class="answer-badge">Generated</span></div>
+      <div id="answer-content" class="answer-content"></div>
+      <div class="sources-heading"><h3>Retrieved source passages</h3><p class="muted">These passages were provided as context for the answer.</p></div>
+      <div id="sources-list" class="sources-list"></div>
+    </section>
+
+    <footer><span>SPML AI Teaching Assistant</span><span>Verify important results with official course notes.</span></footer>
+  </main>
+  <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</body>
+</html>
