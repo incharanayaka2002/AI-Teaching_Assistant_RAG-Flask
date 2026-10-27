@@ -94,3 +94,70 @@ footer { display: flex; justify-content: space-between; gap: 12px; padding: 24px
   .panel { padding: 21px; }
   footer { flex-direction: column; }
 }
+/* Professional formatting for AI-generated answers */
+.answer-content {
+  color: #263244;
+  font-size: 16px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.answer-content h1,
+.answer-content h2,
+.answer-content h3,
+.answer-content h4 {
+  color: #173b70;
+  line-height: 1.4;
+  margin: 26px 0 12px;
+}
+
+.answer-content h2 {
+  padding-bottom: 8px;
+  border-bottom: 1px solid #dce3ed;
+}
+
+.answer-content p {
+  margin: 12px 0;
+}
+
+.answer-content ul,
+.answer-content ol {
+  padding-left: 28px;
+  margin: 12px 0;
+}
+
+.answer-content li {
+  margin-bottom: 8px;
+}
+
+.answer-content mjx-container[display="true"] {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 20px 0 !important;
+  padding: 8px 0;
+}
+
+.answer-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 18px 0;
+}
+
+.answer-content th,
+.answer-content td {
+  border: 1px solid #dce3ed;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.answer-content th {
+  background: #f1f5fa;
+}
+
+.answer-content blockquote {
+  margin: 16px 0;
+  padding: 10px 16px;
+  border-left: 4px solid #3974c6;
+  background: #f4f7fb;
+}
