@@ -25,6 +25,28 @@ function setBusy(busy) {
   askButton.disabled = busy;
   loading.classList.toggle("hidden", !busy);
 }
+async function renderFormattedAnswer(element, answer) {
+  const markdown = answer || "";
+
+  if (
+    typeof marked === "undefined" ||
+    typeof DOMPurify === "undefined"
+  ) {
+    element.textContent = markdown;
+    return;
+  }
+
+  // Convert Markdown into safe HTML.
+  const html = marked.parse(markdown);
+  element.innerHTML = DOMPurify.sanitize(html);
+
+  // Render LaTeX equations after inserting the HTML.
+  if (window.MathJax) {
+    await MathJax.startup.promise;
+    MathJax.typesetClear([element]);
+    await MathJax.typesetPromise([element]);
+  }
+}
 
 askButton.addEventListener("click", async () => {
   const question = questionInput.value.trim();
@@ -44,7 +66,7 @@ askButton.addEventListener("click", async () => {
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Request failed.");
-    answerContent.textContent = data.answer;
+    await renderFormattedAnswer(answerContent, data.answer);
     sourcesList.replaceChildren();
     (data.sources || []).forEach((source) => {
       const card = document.createElement("article");
